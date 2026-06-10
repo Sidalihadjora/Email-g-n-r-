@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fake Account Generator</title>
+
+  <!-- Bootstrap 5 CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* ===== ROOT TOKENS ===== */
+    :root {
+      --bg-main:    #0d1117;
+      --bg-card:    #161b22;
+      --bg-input:   #0d1117;
+      --border:     #30363d;
+      --accent:     #7c3aed;
+      --accent-glow:#a855f7;
+      --accent-soft:#2d1f4e;
+      --green:      #22c55e;
+      --red:        #ef4444;
+      --text-main:  #e6edf3;
+      --text-muted: #7d8590;
+      --text-label: #b3bcc7;
+      --radius:     10px;
+    }
+
+    /* ===== BASE ===== */
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      background: var(--bg-main);
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ===== HEADER ===== */
+    .app-header {
+      background: linear-gradient(135deg, #1a0533 0%, #0d1117 60%);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 0 1.6rem;
+    }
+    .app-header .badge-chip {
+      display: inline-block;
+      background: var(--accent-soft);
+      color: var(--accent-glow);
+      border: 1px solid var(--accent);
+      border-radius: 20px;
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .08em;
+      padding: .25rem .8rem;
+      text-transform: uppercase;
+      margin-bottom: .75rem;
+    }
+    .app-header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      margin: 0;
+    }
+    .app-header h1 span {
+      background: linear-gradient(90deg, #a855f7, #7c3aed);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .app-header p {
+      color: var(--text-muted);
+      margin: .4rem 0 0;
+      font-size: .9rem;
+    }
+
+    /* ===== CARD ===== */
+    .gen-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+    .gen-card .card-header-custom {
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 1.25rem;
+      font-size: .78rem;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .gen-card .card-body-custom {
+      padding: 1.4rem 1.25rem;
+    }
+
+    /* ===== FORM LABELS & INPUTS ===== */
+    .form-label {
+      color: var(--text-label);
+      font-size: .82rem;
+      font-weight: 500;
+      margin-bottom: .4rem;
+    }
+    .form-control, .input-group-text {
+      background: var(--bg-input) !important;
+      border: 1px solid var(--border) !important;
+      color: var(--text-main) !important;
+      border-radius: 7px !important;
+      font-size: .875rem;
+    }
+    .form-control:focus {
+      border-color: var(--accent) !important;
+      box-shadow: 0 0 0 3px rgba(124,58,237,.18) !important;
+    }
+    .form-control::placeholder { color: var(--text-muted) !important; }
+    .input-group .form-control { border-radius: 7px 0 0 7px !important; }
+    .input-group .input-group-text {
+      border-left: 0 !important;
+      border-radius: 0 7px 7px 0 !important;
+      color: var(--text-muted) !important;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn-generate {
+      background: linear-gradient(135deg, #7c3aed, #6d28d9);
+      border: none;
+      color: #fff;
+      font-weight: 600;
+      letter-spacing: .03em;
+      padding: .55rem 1.4rem;
+      border-radius: 7px;
+      transition: filter .2s, transform .15s;
+    }
+    .btn-generate:hover { filter: brightness(1.12); transform: translateY(-1px); color:#fff; }
+    .btn-generate:active { transform: translateY(0); }
+
+    .btn-outline-custom {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-label);
+      font-size: .82rem;
+      font-weight: 500;
+      padding: .45rem 1rem;
+      border-radius: 7px;
+      transition: border-color .2s, color .2s, background .2s;
+    }
+    .btn-outline-custom:hover {
+      border-color: var(--accent);
+      color: var(--accent-glow);
+      background: var(--accent-soft);
+    }
+
+    .btn-copy-row {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: .2rem .45rem;
+      border-radius: 5px;
+      font-size: .8rem;
+      transition: color .18s, background .18s;
+    }
+    .btn-copy-row:hover { color: var(--accent-glow); background: var(--accent-soft); }
+
+    /* ===== COUNTER BADGE ===== */
+    .count-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      background: var(--accent-soft);
+      color: var(--accent-glow);
+      border: 1px solid var(--accent);
+      border-radius: 6px;
+      font-size: .78rem;
+      font-weight: 600;
+      padding: .2rem .7rem;
+    }
+
+    /* ===== TABLE ===== */
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+    table.accounts-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .84rem;
+    }
+    .accounts-table thead th {
+      background: #1c2230;
+      color: var(--text-muted);
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: .75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .accounts-table tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background .15s;
+    }
+    .accounts-table tbody tr:last-child { border-bottom: none; }
+    .accounts-table tbody tr:hover { background: rgba(124,58,237,.06); }
+    .accounts-table td {
+      padding: .65rem 1rem;
+      color: var(--text-main);
+      vertical-align: middle;
+    }
+    .td-num { color: var(--text-muted); font-size: .78rem; width: 46px; }
+    .td-email {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .8rem;
+      color: #60d394;
+    }
+    .td-pass {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .8rem;
+      color: #f59e0b;
+    }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+      text-align: center;
+      padding: 3.5rem 1rem;
+      color: var(--text-muted);
+    }
+    .empty-state i { font-size: 2.5rem; margin-bottom: .75rem; opacity: .35; }
+    .empty-state p { font-size: .875rem; margin: 0; }
+
+    /* ===== TOAST ===== */
+    #toast-container {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+    }
+    .toast-msg {
+      display: flex;
+      align-items: center;
+      gap: .55rem;
+      background: #1e2a1e;
+      border: 1px solid #22c55e44;
+      color: var(--green);
+      border-radius: 8px;
+      padding: .65rem 1rem;
+      font-size: .82rem;
+      font-weight: 500;
+      animation: slideUp .25s ease;
+      box-shadow: 0 4px 20px rgba(0,0,0,.4);
+    }
+    @keyframes slideUp {
+      from { opacity:0; transform: translateY(10px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="app-header">
+    <div class="container">
+      <div class="badge-chip"><i class="bi bi-robot me-1"></i>Dev Tool</div>
+      <h1>Fake Account <span>Generator</span></h1>
+      <p>Générez des comptes fictifs pour vos tests et démonstrations.</p>
+    </div>
+  </header>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main class="container py-4">
+    <div class="row g-4">
+
+      <!-- ===== CONFIG PANEL ===== -->
+      <div class="col-lg-4">
+        <div class="gen-card h-100">
+          <div class="card-header-custom"><i class="bi bi-sliders me-2"></i>Configuration</div>
+          <div class="card-body-custom">
+
+            <!-- Counter -->
+            <div class="mb-3">
+              <label class="form-label">Nombre de comptes</label>
+              <input type="number" id="inp-count" class="form-control"
+                     placeholder="Ex: 10" min="1" max="500" value="5"/>
+              <div class="form-text text-muted" style="font-size:.75rem">Max 500</div>
+            </div>
+
+            <!-- Password -->
+            <div class="mb-3">
+              <label class="form-label">Mot de passe</label>
+              <div class="input-group">
+                <input type="text" id="inp-pass" class="form-control"
+                       placeholder="Ex: Pass@1234" value="Pass@1234"/>
+                <span class="input-group-text"><i class="bi bi-key"></i></span>
+              </div>
+            </div>
+
+            <!-- Prefix -->
+            <div class="mb-3">
+              <label class="form-label">Préfixe de l'adresse</label>
+              <div class="input-group">
+                <input type="text" id="inp-prefix" class="form-control"
+                       placeholder="Ex: user / a / mail" value="user"/>
+                <span class="input-group-text"><i class="bi bi-at"></i></span>
+              </div>
+            </div>
+
+            <!-- Digits count -->
+            <div class="mb-4">
+              <label class="form-label">Nombre de chiffres aléatoires</label>
+              <div class="input-group">
+                <input type="number" id="inp-digits" class="form-control"
+                       placeholder="Ex: 8" min="1" max="20" value="8"/>
+                <span class="input-group-text"><i class="bi bi-hash"></i></span>
+              </div>
+              <div class="form-text text-muted" style="font-size:.75rem">
+                Exemple : user<span style="color:var(--accent-glow)">35821947</span>
+              </div>
+            </div>
+
+            <!-- Generate button -->
+            <button class="btn btn-generate w-100 mb-2" onclick="generateAccounts()">
+              <i class="bi bi-lightning-charge-fill me-2"></i>Generate
+            </button>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== RESULTS PANEL ===== -->
+      <div class="col-lg-8">
+        <div class="gen-card">
+
+          <!-- Results header -->
+          <div class="card-header-custom d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <span>
+              <i class="bi bi-table me-2"></i>Résultats
+              <span id="count-badge" class="ms-2" style="display:none"></span>
+            </span>
+            <div class="d-flex gap-2 flex-wrap" id="action-btns" style="display:none !important">
+              <button class="btn-outline-custom" onclick="copyAll()">
+                <i class="bi bi-clipboard me-1"></i>Copy All
+              </button>
+              <button class="btn-outline-custom" onclick="exportCSV()">
+                <i class="bi bi-file-earmark-spreadsheet me-1"></i>Export CSV
+              </button>
+            </div>
+          </div>
+
+          <!-- Table area -->
+          <div class="card-body-custom p-0">
+            <div id="results-area">
+              <!-- Empty state (default) -->
+              <div class="empty-state" id="empty-state">
+                <i class="bi bi-person-lines-fill d-block"></i>
+                <p>Configurez les paramètres et cliquez sur <strong style="color:var(--accent-glow)">Generate</strong> pour créer des comptes.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ===== TOAST CONTAINER ===== -->
+  <div id="toast-container"></div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    /* ============================================================
+       DATA — listes de prénoms et noms
+    ============================================================ */
+    const PRENOMS = [
+      "Ali","Ahmed","Mohamed","Yacine","Karim","Sofiane","Bilal","Walid",
+      "Amine","Hamza","Omar","Tariq","Riad","Nabil","Djamel","Fares",
+      "Hocine","Lotfi","Mounir","Rachid","Samir","Tarek","Anis","Bassem",
+      "Adel","Aymen","Badis","Charaf","Fouad","Ghiles","Idir","Jilali",
+      "Khaled","Lyes","Malek","Nadir","Oussama","Redha","Salem","Toufik",
+      "Yannis","Zakarya","Imane","Sara","Rania","Douaa","Lina","Nadia",
+      "Hanane","Meriem","Yasmine","Asma","Fatima","Karima","Loubna","Sonia"
+    ];
+
+    const NOMS = [
+      "Benali","Zerari","Sidali","Bouzidi","Hamidi","Mekki","Saadi","Touati",
+      "Brahimi","Cherif","Dahmani","Ferhat","Guenifi","Haddad","Ibrahimi",
+      "Jaber","Kaci","Lakehal","Mansouri","Nasri","Ouali","Rahmani","Slimani",
+      "Tlemcani","Yahiaoui","Ziani","Bensalem","Chabane","Djebbar","Fellag",
+      "Gherbi","Harrat","Ighil","Khaldi","Lazali","Madi","Nekrouf","Ould",
+      "Prenom","Quaissa","Rezig","Selmi","Tiab","Urad","Vidal","Wali",
+      "Xouri","Yahi","Zaidi","Amrani","Belloum","Chikhi","Douifi","Essid"
+    ];
+
+    /* ============================================================
+       STATE — stockage des comptes générés (évite les doublons)
+    ============================================================ */
+    let generatedAccounts = [];   // tableau des comptes actuels
+    let usedAddresses = new Set(); // adresses déjà utilisées dans la session
+
+    /* ============================================================
+       HELPERS
+    ============================================================ */
+
+    /** Choisit un élément aléatoire dans un tableau */
+    function pick(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    /** Génère une chaîne de N chiffres aléatoires */
+    function randomDigits(n) {
+      let s = "";
+      for (let i = 0; i < n; i++) s += Math.floor(Math.random() * 10);
+      return s;
+    }
+
+    /** Génère une adresse unique (préfixe + chiffres) */
+    function uniqueAddress(prefix, digits, maxAttempts = 5000) {
+      for (let i = 0; i < maxAttempts; i++) {
+        const addr = prefix + randomDigits(digits);
+        if (!usedAddresses.has(addr)) {
+          usedAddresses.add(addr);
+          return addr;
+        }
+      }
+      // En cas d'échec (très rare), on rallonge avec 4 chiffres supplémentaires
+      const addr = prefix + randomDigits(digits + 4);
+      usedAddresses.add(addr);
+      return addr;
+    }
+
+    /** Affiche un toast de confirmation */
+    function showToast(msg) {
+      const container = document.getElementById("toast-container");
+      const el = document.createElement("div");
+      el.className = "toast-msg";
+      el.innerHTML = `<i class="bi bi-check-circle-fill"></i>${msg}`;
+      container.appendChild(el);
+      setTimeout(() => el.remove(), 2500);
+    }
+
+    /* ============================================================
+       GENERATE — point d'entrée principal
+    ============================================================ */
+    function generateAccounts() {
+      // --- Lecture & validation des inputs ---
+      const count  = parseInt(document.getElementById("inp-count").value)  || 0;
+      const pass   = document.getElementById("inp-pass").value.trim();
+      const prefix = document.getElementById("inp-prefix").value.trim();
+      const digits = parseInt(document.getElementById("inp-digits").value) || 0;
+
+      if (count < 1 || count > 500) return alert("Veuillez entrer un nombre entre 1 et 500.");
+      if (!pass)                    return alert("Le mot de passe ne peut pas être vide.");
+      if (!prefix)                  return alert("Le préfixe ne peut pas être vide.");
+      if (digits < 1 || digits > 20) return alert("Le nombre de chiffres doit être entre 1 et 20.");
+
+      // --- Génération ---
+      generatedAccounts = [];
+      usedAddresses.clear(); // on repart d'un état propre à chaque génération
+
+      for (let i = 1; i <= count; i++) {
+        generatedAccounts.push({
+          num:     i,
+          prenom:  pick(PRENOMS),
+          nom:     pick(NOMS),
+          adresse: uniqueAddress(prefix, digits),
+          motdepasse: pass
+        });
+      }
+
+      renderTable();
+      showToast(`${count} compte(s) généré(s) avec succès !`);
+    }
+
+    /* ============================================================
+       RENDER — construit le tableau HTML
+    ============================================================ */
+    function renderTable() {
+      const area = document.getElementById("results-area");
+
+      if (generatedAccounts.length === 0) {
+        area.innerHTML = `
+          <div class="empty-state" id="empty-state">
+            <i class="bi bi-person-lines-fill d-block"></i>
+            <p>Aucun compte à afficher.</p>
+          </div>`;
+        document.getElementById("count-badge").style.display = "none";
+        document.getElementById("action-btns").style.display = "none !important";
+        return;
+      }
+
+      // Afficher le badge compteur
+      const badge = document.getElementById("count-badge");
+      badge.style.display = "inline-flex";
+      badge.outerHTML = `
+        <span id="count-badge" class="count-badge ms-2">
+          <i class="bi bi-people-fill"></i>${generatedAccounts.length} comptes
+        </span>`;
+
+      // Afficher les boutons d'action
+      const btns = document.getElementById("action-btns");
+      btns.style.cssText = "display:flex !important";
+
+      // Construire les lignes
+      const rows = generatedAccounts.map(acc => `
+        <tr>
+          <td class="td-num">${acc.num}</td>
+          <td>${acc.prenom}</td>
+          <td>${acc.nom}</td>
+          <td class="td-email">${escHtml(acc.adresse)}</td>
+          <td class="td-pass">${escHtml(acc.motdepasse)}</td>
+          <td>
+            <button class="btn-copy-row" title="Copier cette ligne"
+              onclick="copyRow(${acc.num - 1})">
+              <i class="bi bi-clipboard"></i>
+            </button>
+          </td>
+        </tr>
+      `).join("");
+
+      area.innerHTML = `
+        <div class="table-wrapper">
+          <table class="accounts-table">
+            <thead>
+              <tr>
+                <th>N°</th>
+                <th>Prénom</th>
+                <th>Nom</th>
+                <th>Adresse</th>
+                <th>Mot de passe</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+    }
+
+    /** Échappe les caractères HTML spéciaux */
+    function escHtml(str) {
+      return String(str)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;");
+    }
+
+    /* ============================================================
+       COPY ROW — copie une seule ligne
+    ============================================================ */
+    function copyRow(index) {
+      const acc = generatedAccounts[index];
+      if (!acc) return;
+      const text = `${acc.num}\t${acc.prenom}\t${acc.nom}\t${acc.adresse}\t${acc.motdepasse}`;
+      navigator.clipboard.writeText(text).then(() => showToast("Ligne copiée !"));
+    }
+
+    /* ============================================================
+       COPY ALL — copie toutes les données en TSV
+    ============================================================ */
+    function copyAll() {
+      if (!generatedAccounts.length) return;
+      const header = "N°\tPrénom\tNom\tAdresse\tMot de passe";
+      const rows = generatedAccounts.map(a =>
+        `${a.num}\t${a.prenom}\t${a.nom}\t${a.adresse}\t${a.motdepasse}`
+      ).join("\n");
+      navigator.clipboard.writeText(header + "\n" + rows)
+        .then(() => showToast("Toutes les données copiées !"));
+    }
+
+    /* ============================================================
+       EXPORT CSV — télécharge un fichier CSV
+    ============================================================ */
+    function exportCSV() {
+      if (!generatedAccounts.length) return;
+
+      // En-tête + lignes avec séparateur virgule
+      const lines = [
+        ["N°","Prénom","Nom","Adresse","Mot de passe"].join(","),
+        ...generatedAccounts.map(a =>
+          [a.num, csvEsc(a.prenom), csvEsc(a.nom), csvEsc(a.adresse), csvEsc(a.motdepasse)].join(",")
+        )
+      ];
+
+      const blob = new Blob(["\uFEFF" + lines.join("\r\n")], { type: "text/csv;charset=utf-8;" });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement("a");
+      a.href     = url;
+      a.download = "comptes_fictifs.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast("Fichier CSV exporté !");
+    }
+
+    /** Entoure une valeur de guillemets si elle contient une virgule, un guillemet ou un saut de ligne */
+    function csvEsc(val) {
+      const s = String(val);
+      return (s.includes(",") || s.includes('"') || s.includes("\n"))
+        ? `"${s.replace(/"/g,'""')}"` : s;
+    }
+
+  </script>
+</body>
+</html>
